@@ -218,5 +218,5 @@ _Pvt_Extensions
 
 #My custom scripts/files
 build_release.sh
-AutoShutdown2-*
+AntiCombatLog-*
 update_server.sh

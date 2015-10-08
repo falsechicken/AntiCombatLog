@@ -1,5 +1,5 @@
 //
-//  AntiCombatLog.cs
+//  CombatLogEntry.cs
 //
 //  Author: False_Chicken
 //  Contact: jmdevsupport@gmail.com
@@ -21,63 +21,36 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
-using System.Collections.Generic;
-
-using Rocket.Core.Plugins;
-using Rocket.API;
-using Rocket.Unturned.Player;
 
 using Steamworks;
 
 namespace FC.AntiCombatLog
 {
-	public class AntiCombatLog : RocketPlugin<AntiCombatLogConfiguration>
+	public class CombatLogEntry
 	{
-		#region CONSTANTS
+		public CSteamID SteamID;
 
-		private const string C_VERSION = "0.1";
+		public ushort SecondsRemaining;
 
-		#endregion
+		public bool Damaged;
 
-		#region STORAGE VARIABLES
-
-		private Dictionary<ushort, CSteamID> playerMap;
-
-		private DateTime now;
-
-		private DateTime lastCalled;
-
-		#endregion
-
-		#region ROCKET FUNCTIONS
-
-		protected override void Load()
+		public CombatLogEntry (CSteamID _steamID, bool _damaged)
 		{
-			playerMap = new Dictionary<ushort, CSteamID>();
+			SteamID = _steamID;
 
-			lastCalled = DateTime.Now;
+			Damaged = _damaged;
+
+			SecondsRemaining = 0;
 		}
 
-		void FixedUpdate()
+		public CombatLogEntry (CSteamID _steamID, bool _damaged, ushort _secondsRemaining)
 		{
-			UpdateTime();
+			SteamID = _steamID;
 
-			if ((now - lastCalled).TotalSeconds > 1) //Update once per second.
-			{
-				
-			}
+			Damaged = _damaged;
+
+			SecondsRemaining = _secondsRemaining;
 		}
-
-		#endregion
-
-		#region PLUGIN FUNCTIONS
-
-		private void UpdateTime()
-		{
-			now = DateTime.Now;
-		}
-
-		#endregion
 	}
 }
 
