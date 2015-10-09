@@ -258,4 +258,3 @@ namespace FC.AntiCombatLog
 		#endregion
 	}
 }
-
