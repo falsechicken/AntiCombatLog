@@ -8,7 +8,7 @@ A Rocket plug-in that punishes players who disconnect from the server after a co
 <WarningMessageColor>red</WarningMessageColor> - The color of all the messages the plug-in prints.
 ```
 
-- LIMITATIONS -
+-- LIMITATIONS --
 
 Currently combat loggers will not be punished if the server restarts before they log back on after combat logging. This is because the list of
 combat loggers is stored in memory. Looking into a solution.
