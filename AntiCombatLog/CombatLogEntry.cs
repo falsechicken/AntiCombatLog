@@ -34,6 +34,8 @@ namespace FC.AntiCombatLog
 
 		public bool Damaged;
 
+		public byte Health;
+
 		public CombatLogEntry (CSteamID _steamID, bool _damaged)
 		{
 			SteamID = _steamID;
@@ -50,6 +52,17 @@ namespace FC.AntiCombatLog
 			Damaged = _damaged;
 
 			SecondsRemaining = _secondsRemaining;
+		}
+
+		public CombatLogEntry (CSteamID _steamID, bool _damaged, ushort _secondsRemaining, byte _health)
+		{
+			SteamID = _steamID;
+
+			Damaged = _damaged;
+
+			SecondsRemaining = _secondsRemaining;
+
+			Health = _health;
 		}
 	}
 }

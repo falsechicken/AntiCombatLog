@@ -27,7 +27,9 @@ namespace FC.AntiCombatLog
 {
 	public class AntiCombatLogConfiguration : IRocketPluginConfiguration
 	{
-		public int CombatLogGracePeriod;
+		public ushort CombatLogGracePeriod;
+
+		public string WarningMessageColor;
 
 		public AntiCombatLogConfiguration ()
 		{
@@ -35,7 +37,8 @@ namespace FC.AntiCombatLog
 
 		public void LoadDefaults()
 		{
-
+			CombatLogGracePeriod = 15;
+			WarningMessageColor = "red";
 		}
 	}
 }

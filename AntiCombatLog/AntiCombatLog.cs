@@ -31,6 +31,12 @@ using Rocket.Unturned;
 using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
 using Rocket.Unturned.Plugins;
+using Rocket.Unturned.Chat;
+using Rocket.Core.Logging;
+
+using SDG.Unturned;
+
+using UnityEngine;
 
 using Steamworks;
 
@@ -47,6 +53,8 @@ namespace FC.AntiCombatLog
 		#region STORAGE VARIABLES
 
 		private Dictionary<CSteamID, CombatLogEntry> playerDatabase;
+
+		private List<CSteamID> combatLoggers;
 
 		private DateTime now;
 
@@ -66,6 +74,8 @@ namespace FC.AntiCombatLog
 		{
 			Instance = this;
 
+			combatLoggers = new List<CSteamID>();
+
 			invHelper = new InventoryHelper();
 
 			playerDatabase = new Dictionary<CSteamID, CombatLogEntry>();
@@ -73,6 +83,11 @@ namespace FC.AntiCombatLog
 			lastCalled = DateTime.Now;
 
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
+			U.Events.OnPlayerConnected += OnPlayerConnected;
+
+			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerUpdateHealth += OnPlayerHealthChange;
+
+			ShowVersionMessage();
 		}
 
 		void FixedUpdate()
@@ -105,9 +120,6 @@ namespace FC.AntiCombatLog
 		 */
 		private void UpdatePlayerDatabase()
 		{
-
-			//TODO: Add all players not already in the database to the database first.
-
 			foreach (CSteamID playerID in playerDatabase.Keys)
 			{
 				tmpEntry = playerDatabase[playerID];
@@ -115,9 +127,95 @@ namespace FC.AntiCombatLog
 				if (tmpEntry.Damaged)
 				{
 					if (tmpEntry.SecondsRemaining > 0) tmpEntry.SecondsRemaining--; //Decrement the players seconds remaining until they can log out safely.
-					else tmpEntry.Damaged = false;
+					else 
+					{
+						tmpEntry.Damaged = false;
+						ShowSafeToDisconnectToPlayer(UnturnedPlayer.FromCSteamID(playerID));
+					}
 				}
 			}
+		}
+
+
+		/**
+		 * Add players to the database.
+		 */
+		private void AddPlayerToPlayerDatabase(CSteamID _steamID)
+		{
+			playerDatabase.Add(_steamID, new CombatLogEntry(_steamID, false, 0, UnturnedPlayer.FromCSteamID(_steamID).Health));
+		}
+
+		/**
+		 * Remove player from database.
+		 */
+		private void RemovePlayerFromDatabase(CSteamID _steamID)
+		{
+			playerDatabase.Remove(_steamID);
+		}
+
+		private void ProcessCombatLogger(UnturnedPlayer _player)
+		{
+			//TODO: Figure out way to punish players. Cannot seem to clear their inventory.
+
+			AddPlayerToCombatLoggersList(_player.CSteamID);
+
+			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") has combat logged!");
+
+			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+		}
+
+		private void ProcessReturningCombatLogger(CSteamID _playerID)
+		{
+			if (combatLoggers.Contains(_playerID))
+			{
+				invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
+				invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
+
+				ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
+			}
+		}
+
+		private void AddPlayerToCombatLoggersList(CSteamID _playerID)
+		{
+			combatLoggers.Add(_playerID);
+		}
+
+		private void RemovePlayerFromCombatLoggersList(CSteamID _playersID)
+		{
+			combatLoggers.Remove(_playersID);
+		}
+
+		/**
+		 * Show the player a message informing them that they just got hurt
+		 * and need to wait to be able to disconnect without being punished.
+		 */
+		private void ShowHurtWarningToPlayer(UnturnedPlayer _player)
+		{
+			UnturnedChat.Say(_player, "You have been injured. Please wait " + 
+			                 this.Configuration.Instance.CombatLogGracePeriod + " seconds before disconnecting to avoid being punished.", 
+			                 	UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
+		}
+
+		private void ShowSecondsRemainingToPlayer(UnturnedPlayer _player)
+		{
+			UnturnedChat.Say(_player, this.Configuration.Instance.CombatLogGracePeriod + 
+			                 " seconds remaining until safe logout.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
+		}
+
+		private void ShowSafeToDisconnectToPlayer(UnturnedPlayer _player)
+		{
+			UnturnedChat.Say(_player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
+		}
+
+		private void ShowCombatLoggerPunishToPlayer(UnturnedPlayer _player)
+		{
+			UnturnedChat.Say(_player, "You where punished for combat logging. Inventory cleared.", 
+			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
+		}
+
+		private void ShowVersionMessage()
+		{
+			Logger.Log("Version " + C_VERSION + " Loaded.");
 		}
 
 		#endregion
@@ -128,9 +226,32 @@ namespace FC.AntiCombatLog
 		{
 			if(playerDatabase[_player.CSteamID].Damaged)
 			{
-				//TODO: KILL PLAYER
-				invHelper.ClearInv(_player);
-				invHelper.ClearClothes(_player);
+				ProcessCombatLogger(_player);
+				RemovePlayerFromDatabase(_player.CSteamID);
+			}
+			else RemovePlayerFromDatabase(_player.CSteamID);
+		}
+
+		private void OnPlayerConnected(UnturnedPlayer _player)
+		{
+			AddPlayerToPlayerDatabase(_player.CSteamID);
+
+			ProcessReturningCombatLogger(_player.CSteamID);
+		}
+
+		private void OnPlayerHealthChange(UnturnedPlayer _player, byte _health)
+		{
+			if (_health < playerDatabase[_player.CSteamID].Health) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
+			{
+				ShowHurtWarningToPlayer(_player);
+
+				playerDatabase[_player.CSteamID].Damaged = true;
+				playerDatabase[_player.CSteamID].Health =_health;
+				playerDatabase[_player.CSteamID].SecondsRemaining = this.Configuration.Instance.CombatLogGracePeriod;
+			}
+			else
+			{
+				playerDatabase[_player.CSteamID].Health =_health;
 			}
 		}
 
