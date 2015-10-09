@@ -6,6 +6,8 @@ A Rocket plug-in that punishes players who disconnect from the server after a co
 <CombatLogGracePeriod>15</CombatLogGracePeriod> - How many seconds after getting hit do you have to wait to not be considered combat logging.
  
 <WarningMessageColor>red</WarningMessageColor> - The color of all the messages the plug-in prints.
+
+<ShowCombatLogMessagesToGlobalChat>true</ShowCombatLogMessagesToGlobalChat> - Tell all players on the server about the combat logger.
 ```
 
 -- LIMITATIONS --
