@@ -86,7 +86,7 @@ namespace FC.AntiCombatLog
 			U.Events.OnPlayerConnected += OnPlayerConnected;
 
 			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerUpdateHealth += OnPlayerHealthChange;
-			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerDead += OnPlayerDeath;
+			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerDead += OnPlayerDead;
 
 			ShowVersionMessage();
 		}
@@ -266,7 +266,7 @@ namespace FC.AntiCombatLog
 			}
 		}
 
-		private void OnPlayerDeath(UnturnedPlayer _player, Vector3 _position)
+		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
 		{
 			playerDatabase[_player.CSteamID].Damaged = false;
 			ShowSafeToDisconnectToPlayer(_player);
