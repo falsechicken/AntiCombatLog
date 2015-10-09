@@ -23,9 +23,14 @@
 using System;
 using System.Collections.Generic;
 
-using Rocket.Core.Plugins;
+using Rocket;
 using Rocket.API;
+using Rocket.API.Collections;
+using Rocket.Core.Plugins;
+using Rocket.Unturned;
+using Rocket.Unturned.Events;
 using Rocket.Unturned.Player;
+using Rocket.Unturned.Plugins;
 
 using Steamworks;
 
@@ -41,11 +46,17 @@ namespace FC.AntiCombatLog
 
 		#region STORAGE VARIABLES
 
-		private Dictionary<ushort, CSteamID> playerMap;
+		private Dictionary<CSteamID, CombatLogEntry> playerDatabase;
 
 		private DateTime now;
 
 		private DateTime lastCalled;
+
+		private CombatLogEntry tmpEntry;
+
+		private InventoryHelper invHelper;
+
+		public static AntiCombatLog Instance;
 
 		#endregion
 
@@ -53,9 +64,15 @@ namespace FC.AntiCombatLog
 
 		protected override void Load()
 		{
-			playerMap = new Dictionary<ushort, CSteamID>();
+			Instance = this;
+
+			invHelper = new InventoryHelper();
+
+			playerDatabase = new Dictionary<CSteamID, CombatLogEntry>();
 
 			lastCalled = DateTime.Now;
+
+			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 		}
 
 		void FixedUpdate()
@@ -64,7 +81,8 @@ namespace FC.AntiCombatLog
 
 			if ((now - lastCalled).TotalSeconds > 1) //Update once per second.
 			{
-				
+				UpdatePlayerDatabase();
+				UpdateLastCalled();
 			}
 		}
 
@@ -75,6 +93,45 @@ namespace FC.AntiCombatLog
 		private void UpdateTime()
 		{
 			now = DateTime.Now;
+		}
+
+		private void UpdateLastCalled()
+		{
+			lastCalled = DateTime.Now;
+		}
+
+		/**
+		 * Update the player database. Decrement the seconds remaining, changed damaged state, etc.
+		 */
+		private void UpdatePlayerDatabase()
+		{
+
+			//TODO: Add all players not already in the database to the database first.
+
+			foreach (CSteamID playerID in playerDatabase.Keys)
+			{
+				tmpEntry = playerDatabase[playerID];
+
+				if (tmpEntry.Damaged)
+				{
+					if (tmpEntry.SecondsRemaining > 0) tmpEntry.SecondsRemaining--; //Decrement the players seconds remaining until they can log out safely.
+					else tmpEntry.Damaged = false;
+				}
+			}
+		}
+
+		#endregion
+
+		#region PLUGIN EVENT HANDLERS
+
+		private void OnPlayerDisconnected(UnturnedPlayer _player)
+		{
+			if(playerDatabase[_player.CSteamID].Damaged)
+			{
+				//TODO: KILL PLAYER
+				invHelper.ClearInv(_player);
+				invHelper.ClearClothes(_player);
+			}
 		}
 
 		#endregion
