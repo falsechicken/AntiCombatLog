@@ -116,6 +116,8 @@ namespace FC.AntiCombatLog
 			lastCalled = DateTime.Now;
 		}
 
+		#region PLUGIN PLAYER DATABASE FUNCTIONS
+
 		/**
 		 * Update the player database. Decrement the seconds remaining, changed damaged state, etc.
 		 */
@@ -137,7 +139,6 @@ namespace FC.AntiCombatLog
 			}
 		}
 
-
 		/**
 		 * Add players to the database.
 		 */
@@ -153,6 +154,10 @@ namespace FC.AntiCombatLog
 		{
 			playerDatabase.Remove(_steamID);
 		}
+
+		#endregion
+
+		#region PLUGIN COMBAT LOGGER FUNCTIONS
 
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
@@ -186,7 +191,9 @@ namespace FC.AntiCombatLog
 			combatLoggers.Remove(_playersID);
 		}
 
-		#region MESSAGING FUNCTIONS
+		#endregion
+
+		#region PLUGIN MESSAGING FUNCTIONS
 
 		/**
 		 * Show the player a message informing them that they just got hurt
