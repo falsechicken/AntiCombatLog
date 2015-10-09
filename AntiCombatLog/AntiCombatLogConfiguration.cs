@@ -31,6 +31,8 @@ namespace FC.AntiCombatLog
 
 		public string WarningMessageColor;
 
+		public bool ShowCombatLogMessagesToGlobalChat;
+
 		public AntiCombatLogConfiguration ()
 		{
 		}
@@ -39,6 +41,7 @@ namespace FC.AntiCombatLog
 		{
 			CombatLogGracePeriod = 15;
 			WarningMessageColor = "red";
+			ShowCombatLogMessagesToGlobalChat = true;
 		}
 	}
 }

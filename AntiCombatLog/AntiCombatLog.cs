@@ -155,13 +155,13 @@ namespace FC.AntiCombatLog
 
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
-			//TODO: Figure out way to punish players. Cannot seem to clear their inventory.
-
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
 			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") has combat logged!");
 
 			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+
+			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
 		}
 
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
@@ -210,6 +210,12 @@ namespace FC.AntiCombatLog
 		private void ShowCombatLoggerPunishToPlayer(UnturnedPlayer _player)
 		{
 			UnturnedChat.Say(_player, "You where punished for combat logging. Inventory cleared.", 
+			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
+		}
+
+		private void ShowCombatLoggerMessageToChat(UnturnedPlayer _player)
+		{
+			UnturnedChat.Say(_player.CharacterName + " is a combat logger!", 
 			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
