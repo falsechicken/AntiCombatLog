@@ -28,7 +28,7 @@
     <ConsolePause>false</ConsolePause>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="../build_release.sh" workingdir="${SolutionDir}" externalConsole="True" />
+        <Command type="AfterBuild" command="../build_release.sh sign" workingdir="${SolutionDir}" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
