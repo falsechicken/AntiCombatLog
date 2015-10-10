@@ -34,23 +34,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\AutoShutdown2\AutoShutdown2\libs\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Rocket.API">
-      <HintPath>..\..\AutoShutdown2\AutoShutdown2\libs\Rocket.API.dll</HintPath>
-    </Reference>
-    <Reference Include="Rocket.Core">
-      <HintPath>..\..\AutoShutdown2\AutoShutdown2\libs\Rocket.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Rocket.Unturned">
-      <HintPath>..\..\AutoShutdown2\AutoShutdown2\libs\Rocket.Unturned.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\Propriatary Libs\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\Propriatary Libs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\Rocket Libs\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.API">
+      <HintPath>..\..\Rocket Libs\Rocket.API.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Core">
+      <HintPath>..\..\Rocket Libs\Rocket.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Rocket.Unturned">
+      <HintPath>..\..\Rocket Libs\Rocket.Unturned.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
