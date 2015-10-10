@@ -106,11 +106,18 @@ namespace FC.AntiCombatLog
 
 		#region PLUGIN FUNCTIONS
 
+		/**
+		 * Update the internal time variable.
+		 */
 		private void UpdateTime()
 		{
 			now = DateTime.Now;
 		}
 
+		/**
+		 * Update the last called variable. Used to make sure we only update once a second.
+		 * TODO: May need to make the changing of the damaged state faster for better detection.
+		 */
 		private void UpdateLastCalled()
 		{
 			lastCalled = DateTime.Now;
@@ -159,6 +166,11 @@ namespace FC.AntiCombatLog
 
 		#region PLUGIN COMBAT LOGGER FUNCTIONS
 
+		/**
+		 * Adds a combat logger to the list, prints their name to the server console,
+		 * "Kills" the player so they drop their loot, and prints the combat loggers
+		 * name to the global chat if configured to do so.
+		 */
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
 			AddPlayerToCombatLoggersList(_player.CSteamID);
@@ -170,6 +182,11 @@ namespace FC.AntiCombatLog
 			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
 		}
 
+		/**
+		 * When the combat logger is "Killed" by ProcessCombatLogger they are added to a list to clear
+		 * their inventory when they come back. This is because clearing their inventory when they
+		 * are disconnecting doesnt work.
+		 */
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
 			if (combatLoggers.Contains(_playerID))
@@ -181,11 +198,19 @@ namespace FC.AntiCombatLog
 			}
 		}
 
+		/**
+		 * Adds a player to the combat loggers list. Used to punish them
+		 * when they come back online.
+		 */
 		private void AddPlayerToCombatLoggersList(CSteamID _playerID)
 		{
 			combatLoggers.Add(_playerID);
 		}
 
+
+		/**
+		 * Removes a player from the combat loggers list. 
+		 */
 		private void RemovePlayerFromCombatLoggersList(CSteamID _playersID)
 		{
 			combatLoggers.Remove(_playersID);
@@ -196,8 +221,8 @@ namespace FC.AntiCombatLog
 		#region PLUGIN MESSAGING FUNCTIONS
 
 		/**
-		 * Show the player a message informing them that they just got hurt
-		 * and need to wait to be able to disconnect without being punished.
+		 * Inform the player that they just got hurt and need to wait
+		 * to be able to disconnect without being punished.
 		 */
 		private void ShowHurtWarningToPlayer(UnturnedPlayer _player)
 		{
@@ -206,29 +231,44 @@ namespace FC.AntiCombatLog
 			                 	UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
+		/**
+		 * Inform the player of the number of seconds remaining until they can safely logout.
+		 */
 		private void ShowSecondsRemainingToPlayer(UnturnedPlayer _player)
 		{
 			UnturnedChat.Say(_player, this.Configuration.Instance.CombatLogGracePeriod + 
 			                 " seconds remaining until safe logout.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
+		/**
+		 * Inform the player that it is now safe to log out.
+		 */
 		private void ShowSafeToDisconnectToPlayer(UnturnedPlayer _player)
 		{
 			UnturnedChat.Say(_player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
+		/**
+		 * Inform the player that they have been punished for combat logging.
+		 */
 		private void ShowCombatLoggerPunishToPlayer(UnturnedPlayer _player)
 		{
 			UnturnedChat.Say(_player, "You where punished for combat logging. Inventory cleared.", 
 			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
+		/**
+		 * Inform everyone who the combat logger is.
+		 */
 		private void ShowCombatLoggerMessageToChat(UnturnedPlayer _player)
 		{
 			UnturnedChat.Say(_player.CharacterName + " is a combat logger!", 
 			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
+		/**
+		 * Print the plugin init message to the console.
+		 */
 		private void ShowVersionMessage()
 		{
 			Logger.Log("Version " + C_VERSION + " Loaded.");
@@ -275,8 +315,11 @@ namespace FC.AntiCombatLog
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
 		{
-			playerDatabase[_player.CSteamID].Damaged = false;
-			ShowSafeToDisconnectToPlayer(_player);
+			if(playerDatabase[_player.CSteamID].Damaged)
+			{
+				playerDatabase[_player.CSteamID].Damaged = false;
+				ShowSafeToDisconnectToPlayer(_player);
+			}
 		}
 
 		#endregion
