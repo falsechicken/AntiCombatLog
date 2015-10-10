@@ -220,4 +220,4 @@ _Pvt_Extensions
 build_release.sh
 AntiCombatLog-*
 update_server.sh
-build_latest_auto.sh
+build_latest_develop.sh
