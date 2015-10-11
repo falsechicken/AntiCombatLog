@@ -32,6 +32,8 @@ namespace FC.AntiCombatLog
 
 		public ushort SecondsRemaining;
 
+		public byte BleedingTimer; //Used to prevent message spam when bleeding.
+
 		public bool Damaged;
 
 		public byte Health;

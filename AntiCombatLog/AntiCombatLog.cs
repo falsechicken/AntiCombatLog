@@ -46,7 +46,7 @@ namespace FC.AntiCombatLog
 	{
 		#region CONSTANTS
 
-		private const string C_VERSION = "0.1.6";
+		private const string C_VERSION = "0.2.0";
 
 		#endregion
 
@@ -142,6 +142,8 @@ namespace FC.AntiCombatLog
 						tmpEntry.Damaged = false;
 						ShowSafeToDisconnectToPlayer(UnturnedPlayer.FromCSteamID(playerID));
 					}
+
+					if (tmpEntry.BleedingTimer > 0) tmpEntry.BleedingTimer--; //Decrement bleeding timer. Used to prevent message spam when bleeding.
 				}
 			}
 		}
@@ -299,18 +301,34 @@ namespace FC.AntiCombatLog
 
 		private void OnPlayerHealthChange(UnturnedPlayer _player, byte _health)
 		{
-			if (_health < playerDatabase[_player.CSteamID].Health) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
-			{
-				ShowHurtWarningToPlayer(_player);
+			tmpEntry = playerDatabase[_player.CSteamID];
 
-				playerDatabase[_player.CSteamID].Damaged = true;
-				playerDatabase[_player.CSteamID].Health =_health;
-				playerDatabase[_player.CSteamID].SecondsRemaining = this.Configuration.Instance.CombatLogGracePeriod;
+			if (_health < tmpEntry.Health) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
+			{
+				tmpEntry.Damaged = true;
+				tmpEntry.Health =_health;
+				tmpEntry.SecondsRemaining = this.Configuration.Instance.CombatLogGracePeriod;
+
+				if (_player.Bleeding) tmpEntry.BleedingTimer = 10;
 			}
 			else
 			{
-				playerDatabase[_player.CSteamID].Health =_health;
+				tmpEntry.Health =_health;
 			}
+
+			if (tmpEntry.Damaged)
+			{
+				if(tmpEntry.BleedingTimer == 0)
+				{
+					ShowHurtWarningToPlayer(_player);
+				}
+				else
+				{
+
+				}
+			}
+
+
 		}
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
