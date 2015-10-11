@@ -43,11 +43,19 @@ namespace FC.AntiCombatLog
 
 		private DateTime lastCalled = DateTime.Now;
 
-		private ushort configCombatLogTimeout;
+		private ushort configCombatLogGracePeriod;
+
+		private bool configNotifications;
+
+		private ushort configNotificationInterval;
+
+		private string configMessageColor;
+		
 
 		private DateTime now;
 
-		private string messageColor;
+		private DateTime notificationLastShown;
+
 
 		public void FixedUpdate()
 		{
@@ -56,21 +64,38 @@ namespace FC.AntiCombatLog
 			UpdateStatus();
 		}
 
-		public void Init(ushort _configCombatLogTimeout, string _warningMessageColor)
+		public void Init(ushort _configCombatLogGracePeriod, string _configWarningMessageColor, bool _configNotifications, ushort _configNotificationInterval)
 		{
-			configCombatLogTimeout = _configCombatLogTimeout;
-			messageColor = _warningMessageColor;
+			configCombatLogGracePeriod = _configCombatLogGracePeriod;
+
+			configMessageColor = _configWarningMessageColor;
+
+			configNotifications = _configNotifications;
+
+			configNotificationInterval = _configNotificationInterval;
 
 			ResetStatus();
 		}
 
 		public void OnHit()
 		{
-			InCombat = true;
-			OldHealth = Player.Health;
-			SecondsRemaining = configCombatLogTimeout;
+			if (InCombat)
+			{
+				OldHealth = Player.Health;
+				SecondsRemaining = configCombatLogGracePeriod;
+			}
+			else
+			{
+				InCombat = true;
 
-			if (Bleeding == false) ShowHurtWarning();
+				ShowHurtWarning();
+
+				if (configNotifications) notificationLastShown = now;
+
+				OldHealth = Player.Health;
+				SecondsRemaining = configCombatLogGracePeriod;
+			}
+
 		}
 
 		public void OnDead()
@@ -103,7 +128,10 @@ namespace FC.AntiCombatLog
 				if ((now - lastCalled).TotalSeconds > 1)
 				{
 					SecondsRemaining--;
+
 					UpdateLastCalled(now);
+
+					UpdateNotifications(now);
 				}
 			}
 
@@ -118,14 +146,31 @@ namespace FC.AntiCombatLog
 			OldHealth = Player.Health;
 		}
 
+		private void UpdateNotifications(DateTime _now)
+		{
+			if (configNotifications && (_now - notificationLastShown).Seconds >= configNotificationInterval)
+			{
+				if (Bleeding)
+				{
+					ShowBleeding();
+					notificationLastShown = _now;
+				}
+				else
+				{
+					ShowSecondsRemaining();
+					notificationLastShown = _now;
+				}
+			}
+		}
+
 		/**
 		 * Inform the player that they just got hurt and need to wait
 		 * to be able to disconnect without being punished.
 		 */
 		private void ShowHurtWarning()
 		{
-			UnturnedChat.Say(Player, "You have been injured. Please wait " + configCombatLogTimeout + " seconds before disconnecting to avoid being punished.", 
-			                 UnturnedChat.GetColorFromName(messageColor, Color.red));
+			UnturnedChat.Say(Player, "You have been injured. Please wait " + configCombatLogGracePeriod + " seconds before disconnecting to avoid being punished.", 
+			                 UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 
 		/**
@@ -133,7 +178,21 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowSafeToDisconnect()
 		{
-			UnturnedChat.Say(Player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(messageColor, Color.red));
+			UnturnedChat.Say(Player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
+		}
+
+		/**
+		 * Inform the player of the number of seconds remaining until they can safely logout.
+		 */
+		private void ShowSecondsRemaining()
+		{
+			UnturnedChat.Say(Player, SecondsRemaining + 
+			                 " seconds remaining until safe logout allowed.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
+		}
+
+		private void ShowBleeding()
+		{
+			UnturnedChat.Say(Player, "You are bleeding! Stop bleeding to allow safe logout.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 	}
 }

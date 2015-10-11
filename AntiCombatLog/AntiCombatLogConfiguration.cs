@@ -33,8 +33,13 @@ namespace FC.AntiCombatLog
 
 		public bool ShowCombatLogMessagesToGlobalChat;
 
+		public bool ReminderNotifications;
+
+		public ushort ReminderNotificationInterval;
+
 		public AntiCombatLogConfiguration ()
 		{
+
 		}
 
 		public void LoadDefaults()
@@ -42,6 +47,8 @@ namespace FC.AntiCombatLog
 			CombatLogGracePeriod = 15;
 			WarningMessageColor = "red";
 			ShowCombatLogMessagesToGlobalChat = true;
+			ReminderNotifications = true;
+			ReminderNotificationInterval = 5;
 		}
 	}
 }

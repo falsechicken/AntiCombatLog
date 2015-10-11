@@ -128,7 +128,10 @@ namespace FC.AntiCombatLog
 
 			RemovePlayerFromCombatLoggersList(_playerID);
 
-			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
+			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, 
+			                  this.Configuration.Instance.WarningMessageColor,
+			                  this.Configuration.Instance.ReminderNotifications,
+			                  this.Configuration.Instance.ReminderNotificationInterval);
 		}
 
 		/**
@@ -152,14 +155,7 @@ namespace FC.AntiCombatLog
 
 		#region PLUGIN MESSAGING FUNCTIONS
 
-		/**
-		 * Inform the player of the number of seconds remaining until they can safely logout.
-		 */
-		private void ShowSecondsRemainingToPlayer(UnturnedPlayer _player)
-		{
-			UnturnedChat.Say(_player, this.Configuration.Instance.CombatLogGracePeriod + 
-			                 " seconds remaining until safe logout.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
-		}
+
 
 		/**
 		 * Inform the player that they have been punished for combat logging.
@@ -206,7 +202,10 @@ namespace FC.AntiCombatLog
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
 			if (combatLoggers.Contains(_player.CSteamID)) ProcessReturningCombatLogger(_player.CSteamID);
-			else tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
+			else tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, 
+			                       this.Configuration.Instance.WarningMessageColor,
+			                       this.Configuration.Instance.ReminderNotifications,
+			                       this.Configuration.Instance.ReminderNotificationInterval);
 		}
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
@@ -220,7 +219,10 @@ namespace FC.AntiCombatLog
 		{
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
-			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
+			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, 
+			                  this.Configuration.Instance.WarningMessageColor,
+			                  this.Configuration.Instance.ReminderNotifications,
+			                  this.Configuration.Instance.ReminderNotificationInterval);
 		}
 
 		#endregion
