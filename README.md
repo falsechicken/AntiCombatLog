@@ -8,6 +8,11 @@ A Rocket plug-in that punishes players who disconnect from the server after a co
 <WarningMessageColor>red</WarningMessageColor> - The color of all the messages the plug-in prints.
 
 <ShowCombatLogMessagesToGlobalChat>true</ShowCombatLogMessagesToGlobalChat> - Tell all players on the server about the combat logger.
+
+<ReminderNotifications>true</ReminderNotifications> - Remind the player of how many seconds are left until they can safely log out.
+
+<ReminderNotificationInterval>5</ReminderNotificationInterval> - How many seconds apart to show the reminder notifications.
+
 ```
 
 -- LIMITATIONS --
