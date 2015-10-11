@@ -155,8 +155,6 @@ namespace FC.AntiCombatLog
 
 		#region PLUGIN MESSAGING FUNCTIONS
 
-
-
 		/**
 		 * Inform the player that they have been punished for combat logging.
 		 */
