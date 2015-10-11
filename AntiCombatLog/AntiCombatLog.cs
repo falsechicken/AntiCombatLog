@@ -105,7 +105,7 @@ namespace FC.AntiCombatLog
 		{
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
-			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") has combat logged!");
+			ShowCombatLoggerToConsole(_player);
 
 			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
 
@@ -179,6 +179,11 @@ namespace FC.AntiCombatLog
 		private void ShowVersionMessage()
 		{
 			Logger.Log("Version " + C_VERSION + " Loaded.");
+		}
+
+		private void ShowCombatLoggerToConsole(UnturnedPlayer _player)
+		{
+			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") has combat logged! | " + DateTime.Now);
 		}
 
 		#endregion
