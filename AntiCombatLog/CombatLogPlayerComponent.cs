@@ -1,5 +1,5 @@
 //
-//  CombatLogEntry.cs
+//  CombatLogPlayerComponent.cs
 //
 //  Author: False_Chicken
 //  Contact: jmdevsupport@gmail.com
@@ -21,50 +21,52 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
-
+using Rocket.Unturned.Player;
 using Steamworks;
 
 namespace FC.AntiCombatLog
 {
-	public class CombatLogEntry
+	public class CombatLogPlayerComponent : UnturnedPlayerComponent
 	{
-		public CSteamID SteamID;
-
 		public ushort SecondsRemaining;
 
 		public bool Bleeding;
 
 		public bool InCombat;
 
-		public byte Health;
+		public byte OldHealth;
 
-		public CombatLogEntry (CSteamID _steamID, bool _inCombat)
+		private DateTime lastCalled = DateTime.Now;
+
+		private DateTime now;
+
+		public void FixedUpdate()
 		{
-			SteamID = _steamID;
+			now = DateTime.Now;
 
-			InCombat = _inCombat;
-
-			SecondsRemaining = 0;
+			if((now - lastCalled).TotalSeconds > 1) //Update once per second.
+			{
+				UpdateStatus();
+				UpdateLastCalled(now);
+			}
 		}
 
-		public CombatLogEntry (CSteamID _steamID, bool _inCombat, ushort _secondsRemaining)
+		private void UpdateLastCalled(DateTime _now)
 		{
-			SteamID = _steamID;
-
-			InCombat = _inCombat;
-
-			SecondsRemaining = _secondsRemaining;
+			lastCalled = _now;
 		}
 
-		public CombatLogEntry (CSteamID _steamID, bool _inCombat, ushort _secondsRemaining, byte _health)
+		private void UpdateStatus()
 		{
-			SteamID = _steamID;
+			if (InCombat)
+			{
+				SecondsRemaining--;
+			}
 
-			InCombat = _inCombat;
-
-			SecondsRemaining = _secondsRemaining;
-
-			Health = _health;
+			if (SecondsRemaining = 0)
+			{
+				InCombat = false;
+			}
 		}
 	}
 }

@@ -52,15 +52,11 @@ namespace FC.AntiCombatLog
 
 		#region STORAGE VARIABLES
 
-		private Dictionary<CSteamID, CombatLogEntry> playerDatabase;
-
 		private List<CSteamID> combatLoggers;
 
 		private DateTime now;
 
 		private DateTime lastCalled;
-
-		private CombatLogEntry tmpEntry;
 
 		private InventoryHelper invHelper;
 
@@ -77,8 +73,6 @@ namespace FC.AntiCombatLog
 			combatLoggers = new List<CSteamID>();
 
 			invHelper = new InventoryHelper();
-
-			playerDatabase = new Dictionary<CSteamID, CombatLogEntry>();
 
 			lastCalled = DateTime.Now;
 
@@ -97,7 +91,6 @@ namespace FC.AntiCombatLog
 
 			if ((now - lastCalled).TotalSeconds > 1) //Update once per second.
 			{
-				UpdatePlayerDatabase();
 				UpdateLastCalled();
 			}
 		}
@@ -122,52 +115,6 @@ namespace FC.AntiCombatLog
 		{
 			lastCalled = DateTime.Now;
 		}
-
-		#region PLUGIN PLAYER DATABASE FUNCTIONS
-
-		/**
-		 * Update the player database. Decrement the seconds remaining, changed damaged state, etc.
-		 */
-		private void UpdatePlayerDatabase()
-		{
-			foreach (CSteamID playerID in playerDatabase.Keys)
-			{
-				tmpEntry = playerDatabase[playerID];
-
-				if (tmpEntry.InCombat)
-				{
-					if (tmpEntry.SecondsRemaining > 0) tmpEntry.SecondsRemaining--; //Decrement the players seconds remaining until they can log out safely.
-					else 
-					{
-						tmpEntry.InCombat = false;
-						ShowSafeToDisconnectToPlayer(UnturnedPlayer.FromCSteamID(playerID));
-					}
-
-					if (UnturnedPlayer.FromCSteamID(tmpEntry.SteamID).Bleeding == false && tmpEntry.Bleeding)
-					{
-						tmpEntry.Bleeding = false;
-					}
-				}
-			}
-		}
-
-		/**
-		 * Add players to the database.
-		 */
-		private void AddPlayerToPlayerDatabase(CSteamID _steamID)
-		{
-			playerDatabase.Add(_steamID, new CombatLogEntry(_steamID, false, 0, UnturnedPlayer.FromCSteamID(_steamID).Health));
-		}
-
-		/**
-		 * Remove player from database.
-		 */
-		private void RemovePlayerFromDatabase(CSteamID _steamID)
-		{
-			playerDatabase.Remove(_steamID);
-		}
-
-		#endregion
 
 		#region PLUGIN COMBAT LOGGER FUNCTIONS
 
