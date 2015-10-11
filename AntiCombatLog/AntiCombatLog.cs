@@ -54,10 +54,6 @@ namespace FC.AntiCombatLog
 
 		private List<CSteamID> combatLoggers;
 
-		private DateTime now;
-
-		private DateTime lastCalled;
-
 		private InventoryHelper invHelper;
 
 		private CombatLogPlayerComponent tmpComponent;
@@ -75,8 +71,6 @@ namespace FC.AntiCombatLog
 			combatLoggers = new List<CSteamID>();
 
 			invHelper = new InventoryHelper();
-
-			lastCalled = DateTime.Now;
 
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 			U.Events.OnPlayerConnected += OnPlayerConnected;
