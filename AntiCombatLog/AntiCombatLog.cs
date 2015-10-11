@@ -81,6 +81,17 @@ namespace FC.AntiCombatLog
 			ShowVersionMessage();
 		}
 
+		protected override void Unload()
+		{
+			Logger.LogWarning("Unloading...");
+
+			U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
+			U.Events.OnPlayerConnected -= OnPlayerConnected;
+
+			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerRevive -= OnPlayerRespawn;
+			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerDead -= OnPlayerDead;
+		}
+
 		#endregion
 
 		#region PLUGIN COMBAT LOGGER FUNCTIONS
@@ -148,14 +159,6 @@ namespace FC.AntiCombatLog
 		{
 			UnturnedChat.Say(_player, this.Configuration.Instance.CombatLogGracePeriod + 
 			                 " seconds remaining until safe logout.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
-		}
-
-		/**
-		 * Inform the player that it is now safe to log out.
-		 */
-		private void ShowSafeToDisconnectToPlayer(UnturnedPlayer _player)
-		{
-			UnturnedChat.Say(_player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
 		/**
