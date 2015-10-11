@@ -53,33 +53,35 @@ namespace FC.AntiCombatLog
 		{
 			now = DateTime.Now;
 
-			if((now - lastCalled).TotalSeconds > 1) //Update once per second.
-			{
-				UpdateStatus();
-				UpdateLastCalled(now);
-			}
+			UpdateStatus();
 		}
 
-		public void Event_OnHit(ushort _secondsRemaining, string _warningMessageColor)
+		public void Init(ushort _configCombatLogTimeout, string _warningMessageColor)
+		{
+			configCombatLogTimeout = _configCombatLogTimeout;
+			messageColor = _warningMessageColor;
+
+			ResetStatus();
+		}
+
+		public void OnHit()
 		{
 			InCombat = true;
 			OldHealth = Player.Health;
-			SecondsRemaining = _secondsRemaining;
-			configCombatLogTimeout = _secondsRemaining;
-			messageColor = _warningMessageColor;
+			SecondsRemaining = configCombatLogTimeout;
 
 			if (Bleeding == false) ShowHurtWarning();
+		}
 
-			Bleeding = Player.Bleeding;
-			
+		public void OnDead()
+		{
+			ShowSafeToDisconnect();
 		}
 
 		public void ResetStatus()
 		{
-			if(InCombat) ShowSafeToDisconnect();
-
 			SecondsRemaining = 0;
-			Bleeding = Player.Bleeding;
+			Bleeding = false;
 			OldHealth = Player.Health;
 			InCombat = false;
 		}
@@ -91,15 +93,29 @@ namespace FC.AntiCombatLog
 
 		private void UpdateStatus()
 		{
-			if (InCombat) SecondsRemaining--;
+			if (Player.Health < OldHealth) //Player has been hit.
+			{
+				OnHit();
+			}
+
+			if (InCombat)
+			{
+				if ((now - lastCalled).TotalSeconds > 1)
+				{
+					SecondsRemaining--;
+					UpdateLastCalled(now);
+				}
+			}
 
 			if (SecondsRemaining == 0 && InCombat) 
 			{
-				InCombat = false;
+				ResetStatus();
 				ShowSafeToDisconnect();
 			}
 
 			Bleeding = Player.Bleeding;
+
+			OldHealth = Player.Health;
 		}
 
 		/**

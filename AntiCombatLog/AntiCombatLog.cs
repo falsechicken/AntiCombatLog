@@ -81,42 +81,13 @@ namespace FC.AntiCombatLog
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 			U.Events.OnPlayerConnected += OnPlayerConnected;
 
-			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerUpdateHealth += OnPlayerHealthChange;
+			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerRevive += OnPlayerRespawn;
 			Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerDead += OnPlayerDead;
 
 			ShowVersionMessage();
 		}
 
-		void FixedUpdate()
-		{
-			UpdateTime();
-
-			if ((now - lastCalled).TotalSeconds > 1) //Update once per second.
-			{
-				UpdateLastCalled();
-			}
-		}
-
 		#endregion
-
-		#region PLUGIN FUNCTIONS
-
-		/**
-		 * Update the internal time variable.
-		 */
-		private void UpdateTime()
-		{
-			now = DateTime.Now;
-		}
-
-		/**
-		 * Update the last called variable. Used to make sure we only update once a second.
-		 * TODO: May need to make the changing of the damaged state faster for better detection.
-		 */
-		private void UpdateLastCalled()
-		{
-			lastCalled = DateTime.Now;
-		}
 
 		#region PLUGIN COMBAT LOGGER FUNCTIONS
 
@@ -143,12 +114,16 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
+			tmpComponent = UnturnedPlayer.FromCSteamID(_playerID).GetComponent<CombatLogPlayerComponent>();
+
 			invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
 			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
 			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
 
 			RemovePlayerFromCombatLoggersList(_playerID);
+
+			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
 		}
 
 		/**
@@ -159,7 +134,6 @@ namespace FC.AntiCombatLog
 		{
 			combatLoggers.Add(_playerID);
 		}
-
 
 		/**
 		 * Removes a player from the combat loggers list. 
@@ -218,8 +192,6 @@ namespace FC.AntiCombatLog
 
 		#endregion
 
-		#endregion
-
 		#region PLUGIN EVENT HANDLERS
 
 		private void OnPlayerDisconnected(UnturnedPlayer _player)
@@ -237,28 +209,21 @@ namespace FC.AntiCombatLog
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
 			if (combatLoggers.Contains(_player.CSteamID)) ProcessReturningCombatLogger(_player.CSteamID);
-			else tmpComponent.ResetStatus();
-		}
-
-		private void OnPlayerHealthChange(UnturnedPlayer _player, byte _health)
-		{
-			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
-
-			if (_health < tmpComponent.OldHealth) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
-			{
-				tmpComponent.Event_OnHit(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
-			}
-			else tmpComponent.OldHealth = _health;
+			else tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
 		}
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
 		{
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
-			if(tmpComponent.InCombat)
-			{
-				tmpComponent.ResetStatus();
-			}
+			tmpComponent.OnDead();
+		}
+
+		private void OnPlayerRespawn(UnturnedPlayer _player, Vector3 _position, byte _angle)
+		{
+			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
+
+			tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
 		}
 
 		#endregion
