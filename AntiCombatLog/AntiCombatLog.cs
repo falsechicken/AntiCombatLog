@@ -134,16 +134,19 @@ namespace FC.AntiCombatLog
 			{
 				tmpEntry = playerDatabase[playerID];
 
-				if (tmpEntry.Damaged)
+				if (tmpEntry.InCombat)
 				{
 					if (tmpEntry.SecondsRemaining > 0) tmpEntry.SecondsRemaining--; //Decrement the players seconds remaining until they can log out safely.
 					else 
 					{
-						tmpEntry.Damaged = false;
+						tmpEntry.InCombat = false;
 						ShowSafeToDisconnectToPlayer(UnturnedPlayer.FromCSteamID(playerID));
 					}
 
-					if (tmpEntry.BleedingTimer > 0) tmpEntry.BleedingTimer--; //Decrement bleeding timer. Used to prevent message spam when bleeding.
+					if (UnturnedPlayer.FromCSteamID(tmpEntry.SteamID).Bleeding == false && tmpEntry.Bleeding)
+					{
+						tmpEntry.Bleeding = false;
+					}
 				}
 			}
 		}
@@ -284,7 +287,7 @@ namespace FC.AntiCombatLog
 
 		private void OnPlayerDisconnected(UnturnedPlayer _player)
 		{
-			if(playerDatabase[_player.CSteamID].Damaged)
+			if(playerDatabase[_player.CSteamID].InCombat)
 			{
 				ProcessCombatLogger(_player);
 				RemovePlayerFromDatabase(_player.CSteamID);
@@ -305,37 +308,31 @@ namespace FC.AntiCombatLog
 
 			if (_health < tmpEntry.Health) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
 			{
-				tmpEntry.Damaged = true;
+				tmpEntry.InCombat = true;
 				tmpEntry.Health =_health;
 				tmpEntry.SecondsRemaining = this.Configuration.Instance.CombatLogGracePeriod;
-
-				if (_player.Bleeding) tmpEntry.BleedingTimer = 10;
 			}
 			else
 			{
 				tmpEntry.Health =_health;
 			}
 
-			if (tmpEntry.Damaged)
+			if (tmpEntry.InCombat)
 			{
-				if(tmpEntry.BleedingTimer == 0)
+				if(tmpEntry.Bleeding == false)
 				{
 					ShowHurtWarningToPlayer(_player);
 				}
-				else
-				{
-
-				}
 			}
 
-
+			if (_player.Bleeding) tmpEntry.Bleeding = true;
 		}
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
 		{
-			if(playerDatabase[_player.CSteamID].Damaged)
+			if(playerDatabase[_player.CSteamID].InCombat)
 			{
-				playerDatabase[_player.CSteamID].Damaged = false;
+				playerDatabase[_player.CSteamID].InCombat = false;
 				ShowSafeToDisconnectToPlayer(_player);
 			}
 		}

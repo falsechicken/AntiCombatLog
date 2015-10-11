@@ -32,35 +32,35 @@ namespace FC.AntiCombatLog
 
 		public ushort SecondsRemaining;
 
-		public byte BleedingTimer; //Used to prevent message spam when bleeding.
+		public bool Bleeding;
 
-		public bool Damaged;
+		public bool InCombat;
 
 		public byte Health;
 
-		public CombatLogEntry (CSteamID _steamID, bool _damaged)
+		public CombatLogEntry (CSteamID _steamID, bool _inCombat)
 		{
 			SteamID = _steamID;
 
-			Damaged = _damaged;
+			InCombat = _inCombat;
 
 			SecondsRemaining = 0;
 		}
 
-		public CombatLogEntry (CSteamID _steamID, bool _damaged, ushort _secondsRemaining)
+		public CombatLogEntry (CSteamID _steamID, bool _inCombat, ushort _secondsRemaining)
 		{
 			SteamID = _steamID;
 
-			Damaged = _damaged;
+			InCombat = _inCombat;
 
 			SecondsRemaining = _secondsRemaining;
 		}
 
-		public CombatLogEntry (CSteamID _steamID, bool _damaged, ushort _secondsRemaining, byte _health)
+		public CombatLogEntry (CSteamID _steamID, bool _inCombat, ushort _secondsRemaining, byte _health)
 		{
 			SteamID = _steamID;
 
-			Damaged = _damaged;
+			InCombat = _inCombat;
 
 			SecondsRemaining = _secondsRemaining;
 
