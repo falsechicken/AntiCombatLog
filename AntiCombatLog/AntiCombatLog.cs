@@ -46,7 +46,7 @@ namespace FC.AntiCombatLog
 	{
 		#region CONSTANTS
 
-		private const string C_VERSION = "0.2.0";
+		private const string C_VERSION = "0.2.1";
 
 		#endregion
 

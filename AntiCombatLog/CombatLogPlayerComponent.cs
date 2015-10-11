@@ -33,29 +33,20 @@ namespace FC.AntiCombatLog
 {
 	public class CombatLogPlayerComponent : UnturnedPlayerComponent
 	{
+
 		public ushort SecondsRemaining;
-
 		public bool Bleeding;
-
 		public bool InCombat;
-
 		public byte OldHealth;
 
-		private DateTime lastCalled = DateTime.Now;
-
 		private ushort configCombatLogGracePeriod;
-
-		private bool configNotifications;
-
 		private ushort configNotificationInterval;
-
+		private bool configNotifications;
 		private string configMessageColor;
-		
 
 		private DateTime now;
-
+		private DateTime lastCalled = DateTime.Now;
 		private DateTime notificationLastShown;
-
 
 		public void FixedUpdate()
 		{
@@ -95,7 +86,6 @@ namespace FC.AntiCombatLog
 				OldHealth = Player.Health;
 				SecondsRemaining = configCombatLogGracePeriod;
 			}
-
 		}
 
 		public void OnDead()
@@ -163,6 +153,8 @@ namespace FC.AntiCombatLog
 			}
 		}
 
+		#region MESSAGING FUNCTIONS
+
 		/**
 		 * Inform the player that they just got hurt and need to wait
 		 * to be able to disconnect without being punished.
@@ -194,6 +186,8 @@ namespace FC.AntiCombatLog
 		{
 			UnturnedChat.Say(Player, "You are bleeding! Stop bleeding to allow safe logout.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
+
+		#endregion
 	}
 }
 
