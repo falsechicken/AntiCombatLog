@@ -60,6 +60,8 @@ namespace FC.AntiCombatLog
 
 		private InventoryHelper invHelper;
 
+		private CombatLogPlayerComponent tmpComponent;
+
 		public static AntiCombatLog Instance;
 
 		#endregion
@@ -141,13 +143,12 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
-			if (combatLoggers.Contains(_playerID))
-			{
-				invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
-				invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
+			invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
+			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
-				ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
-			}
+			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
+
+			RemovePlayerFromCombatLoggersList(_playerID);
 		}
 
 		/**
@@ -171,17 +172,6 @@ namespace FC.AntiCombatLog
 		#endregion
 
 		#region PLUGIN MESSAGING FUNCTIONS
-
-		/**
-		 * Inform the player that they just got hurt and need to wait
-		 * to be able to disconnect without being punished.
-		 */
-		private void ShowHurtWarningToPlayer(UnturnedPlayer _player)
-		{
-			UnturnedChat.Say(_player, "You have been injured. Please wait " + 
-			                 this.Configuration.Instance.CombatLogGracePeriod + " seconds before disconnecting to avoid being punished.", 
-			                 	UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
-		}
 
 		/**
 		 * Inform the player of the number of seconds remaining until they can safely logout.
@@ -234,53 +224,40 @@ namespace FC.AntiCombatLog
 
 		private void OnPlayerDisconnected(UnturnedPlayer _player)
 		{
-			if(playerDatabase[_player.CSteamID].InCombat)
+			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
+
+			if(tmpComponent.InCombat)
 			{
 				ProcessCombatLogger(_player);
-				RemovePlayerFromDatabase(_player.CSteamID);
 			}
-			else RemovePlayerFromDatabase(_player.CSteamID);
 		}
 
 		private void OnPlayerConnected(UnturnedPlayer _player)
 		{
-			AddPlayerToPlayerDatabase(_player.CSteamID);
+			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
-			ProcessReturningCombatLogger(_player.CSteamID);
+			if (combatLoggers.Contains(_player.CSteamID)) ProcessReturningCombatLogger(_player.CSteamID);
+			else tmpComponent.ResetStatus();
 		}
 
 		private void OnPlayerHealthChange(UnturnedPlayer _player, byte _health)
 		{
-			tmpEntry = playerDatabase[_player.CSteamID];
+			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
-			if (_health < tmpEntry.Health) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
+			if (_health < tmpComponent.OldHealth) //They have gotten hurt not healed set them as damaged and set their seconds remaining to the config.
 			{
-				tmpEntry.InCombat = true;
-				tmpEntry.Health =_health;
-				tmpEntry.SecondsRemaining = this.Configuration.Instance.CombatLogGracePeriod;
+				tmpComponent.Event_OnHit(this.Configuration.Instance.CombatLogGracePeriod, this.Configuration.Instance.WarningMessageColor);
 			}
-			else
-			{
-				tmpEntry.Health =_health;
-			}
-
-			if (tmpEntry.InCombat)
-			{
-				if(tmpEntry.Bleeding == false)
-				{
-					ShowHurtWarningToPlayer(_player);
-				}
-			}
-
-			if (_player.Bleeding) tmpEntry.Bleeding = true;
+			else tmpComponent.OldHealth = _health;
 		}
 
 		private void OnPlayerDead(UnturnedPlayer _player, Vector3 _position)
 		{
-			if(playerDatabase[_player.CSteamID].InCombat)
+			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
+
+			if(tmpComponent.InCombat)
 			{
-				playerDatabase[_player.CSteamID].InCombat = false;
-				ShowSafeToDisconnectToPlayer(_player);
+				tmpComponent.ResetStatus();
 			}
 		}
 

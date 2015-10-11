@@ -21,8 +21,13 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+
 using Rocket.Unturned.Player;
+using Rocket.Unturned.Chat;
+
 using Steamworks;
+
+using UnityEngine;
 
 namespace FC.AntiCombatLog
 {
@@ -38,7 +43,11 @@ namespace FC.AntiCombatLog
 
 		private DateTime lastCalled = DateTime.Now;
 
+		private ushort configCombatLogTimeout;
+
 		private DateTime now;
+
+		private string messageColor;
 
 		public void FixedUpdate()
 		{
@@ -51,6 +60,30 @@ namespace FC.AntiCombatLog
 			}
 		}
 
+		public void Event_OnHit(ushort _secondsRemaining, string _warningMessageColor)
+		{
+			InCombat = true;
+			OldHealth = Player.Health;
+			SecondsRemaining = _secondsRemaining;
+			configCombatLogTimeout = _secondsRemaining;
+			messageColor = _warningMessageColor;
+
+			if (Bleeding == false) ShowHurtWarning();
+
+			Bleeding = Player.Bleeding;
+			
+		}
+
+		public void ResetStatus()
+		{
+			if(InCombat) ShowSafeToDisconnect();
+
+			SecondsRemaining = 0;
+			Bleeding = Player.Bleeding;
+			OldHealth = Player.Health;
+			InCombat = false;
+		}
+
 		private void UpdateLastCalled(DateTime _now)
 		{
 			lastCalled = _now;
@@ -58,15 +91,33 @@ namespace FC.AntiCombatLog
 
 		private void UpdateStatus()
 		{
-			if (InCombat)
-			{
-				SecondsRemaining--;
-			}
+			if (InCombat) SecondsRemaining--;
 
-			if (SecondsRemaining = 0)
+			if (SecondsRemaining == 0 && InCombat) 
 			{
 				InCombat = false;
+				ShowSafeToDisconnect();
 			}
+
+			Bleeding = Player.Bleeding;
+		}
+
+		/**
+		 * Inform the player that they just got hurt and need to wait
+		 * to be able to disconnect without being punished.
+		 */
+		private void ShowHurtWarning()
+		{
+			UnturnedChat.Say(Player, "You have been injured. Please wait " + configCombatLogTimeout + " seconds before disconnecting to avoid being punished.", 
+			                 UnturnedChat.GetColorFromName(messageColor, Color.red));
+		}
+
+		/**
+		 * Inform the player that it is now safe to log out.
+		 */
+		private void ShowSafeToDisconnect()
+		{
+			UnturnedChat.Say(Player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(messageColor, Color.red));
 		}
 	}
 }
