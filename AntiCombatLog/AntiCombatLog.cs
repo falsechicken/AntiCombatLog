@@ -22,6 +22,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using Rocket;
 using Rocket.API;
@@ -59,6 +60,23 @@ namespace FC.AntiCombatLog
 		private CombatLogPlayerComponent tmpComponent;
 
 		public static AntiCombatLog Instance;
+
+		public override TranslationList DefaultTranslations
+		{
+			get
+			{
+				return new TranslationList() {
+					{ "punish_player_player", "You where punished for combat logging. Inventory cleared."},
+					{ "combat_logger_chat", "{0} is a combat logger!"},
+					{ "combat_logger_console", "has combat logged!"},
+					{ "injured_warning_player", "You have been injured. Please wait {0} seconds before disconnecting to avoid being punished."},
+					{ "safe_to_disconnect_player" , "It is now safe to disconnect."},
+					{ "seconds_remaining_player" , "{0} seconds remaining until safe logout allowed."},
+					{ "bleeding_player", "You are bleeding! Stop bleeding to allow safe logout."},
+					{ "version_console","Version {0} Loaded."}
+				};
+			}
+		}
 
 		#endregion
 
@@ -160,7 +178,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowCombatLoggerPunishToPlayer(UnturnedPlayer _player)
 		{
-			UnturnedChat.Say(_player, "You where punished for combat logging. Inventory cleared.", 
+			UnturnedChat.Say(_player, Translate("punish_player_player"), 
 			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
@@ -169,7 +187,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowCombatLoggerMessageToChat(UnturnedPlayer _player)
 		{
-			UnturnedChat.Say(_player.CharacterName + " is a combat logger!", 
+			UnturnedChat.Say(Translate("combat_logger_chat", _player.CharacterName), 
 			                 UnturnedChat.GetColorFromName(this.Configuration.Instance.WarningMessageColor, Color.red));
 		}
 
@@ -178,12 +196,15 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowVersionMessage()
 		{
-			Logger.Log("Version " + C_VERSION + " Loaded.");
+			Logger.Log(Translate("version_console", Assembly.GetExecutingAssembly().GetName().Version));
 		}
 
+		/**
+		 * Print the combat logger's information to the console.
+		 */
 		private void ShowCombatLoggerToConsole(UnturnedPlayer _player)
 		{
-			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") has combat logged! | " + DateTime.Now);
+			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ")" + Translate("combat_logger_console") + " | " + DateTime.Now);
 		}
 
 		#endregion

@@ -48,12 +48,16 @@ namespace FC.AntiCombatLog
 		private DateTime lastCalled = DateTime.Now;
 		private DateTime notificationLastShown;
 
+		#region ENGINE FUNCTIONS
+
 		public void FixedUpdate()
 		{
 			now = DateTime.Now;
 
 			UpdateStatus();
 		}
+
+		#endregion
 
 		public void Init(ushort _configCombatLogGracePeriod, string _configWarningMessageColor, bool _configNotifications, ushort _configNotificationInterval)
 		{
@@ -68,11 +72,21 @@ namespace FC.AntiCombatLog
 			ResetStatus();
 		}
 
+		public void ResetStatus()
+		{
+			SecondsRemaining = 0;
+			Bleeding = false;
+			OldHealth = Player.Health;
+			InCombat = false;
+		}
+
+		#region "EVENTS"
+
 		public void OnHit()
 		{
 			if (InCombat)
 			{
-				OldHealth = Player.Health;
+				OldHealth = Player.Health; //TODO: Needed?
 				SecondsRemaining = configCombatLogGracePeriod;
 			}
 			else
@@ -83,7 +97,7 @@ namespace FC.AntiCombatLog
 
 				if (configNotifications) notificationLastShown = now;
 
-				OldHealth = Player.Health;
+				OldHealth = Player.Health; //TODO: Needed?
 				SecondsRemaining = configCombatLogGracePeriod;
 			}
 		}
@@ -93,13 +107,9 @@ namespace FC.AntiCombatLog
 			ShowSafeToDisconnect();
 		}
 
-		public void ResetStatus()
-		{
-			SecondsRemaining = 0;
-			Bleeding = false;
-			OldHealth = Player.Health;
-			InCombat = false;
-		}
+		#endregion
+
+		#region UPDATE FUNCTIONS
 
 		private void UpdateLastCalled(DateTime _now)
 		{
@@ -153,6 +163,8 @@ namespace FC.AntiCombatLog
 			}
 		}
 
+		#endregion
+
 		#region MESSAGING FUNCTIONS
 
 		/**
@@ -161,7 +173,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowHurtWarning()
 		{
-			UnturnedChat.Say(Player, "You have been injured. Please wait " + configCombatLogGracePeriod + " seconds before disconnecting to avoid being punished.", 
+			UnturnedChat.Say(Player, AntiCombatLog.Instance.Translate("injured_warning_player", configCombatLogGracePeriod), 
 			                 UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 
@@ -170,7 +182,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowSafeToDisconnect()
 		{
-			UnturnedChat.Say(Player, "It is now safe to disconnect.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
+			UnturnedChat.Say(Player, AntiCombatLog.Instance.Translate("safe_to_disconnect_player"), UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 
 		/**
@@ -178,13 +190,12 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowSecondsRemaining()
 		{
-			UnturnedChat.Say(Player, SecondsRemaining + 
-			                 " seconds remaining until safe logout allowed.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
+			UnturnedChat.Say(Player, AntiCombatLog.Instance.Translate("seconds_remaining_player", SecondsRemaining), UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 
 		private void ShowBleeding()
 		{
-			UnturnedChat.Say(Player, "You are bleeding! Stop bleeding to allow safe logout.", UnturnedChat.GetColorFromName(configMessageColor, Color.red));
+			UnturnedChat.Say(Player, AntiCombatLog.Instance.Translate("bleeding_player"), UnturnedChat.GetColorFromName(configMessageColor, Color.red));
 		}
 
 		#endregion
