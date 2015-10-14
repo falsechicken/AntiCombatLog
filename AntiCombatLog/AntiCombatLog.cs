@@ -45,11 +45,6 @@ namespace FC.AntiCombatLog
 {
 	public class AntiCombatLog : RocketPlugin<AntiCombatLogConfiguration>
 	{
-		#region CONSTANTS
-
-		private const string C_VERSION = "0.2.1";
-
-		#endregion
 
 		#region STORAGE VARIABLES
 
