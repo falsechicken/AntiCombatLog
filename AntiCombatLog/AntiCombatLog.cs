@@ -204,7 +204,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ShowCombatLoggerToConsole(UnturnedPlayer _player)
 		{
-			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ")" + Translate("combat_logger_console") + " | " + DateTime.Now);
+			Logger.Log(_player.CharacterName + " (" + _player.SteamName + ") " + Translate("combat_logger_console") + " | " + DateTime.Now);
 		}
 
 		#endregion
