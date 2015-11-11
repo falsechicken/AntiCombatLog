@@ -55,13 +55,13 @@ namespace FC.AntiCombatLog
 						}
 					}
 				}
-				player.Player.SteamChannel.send("tellSlot", ESteamCall.ALL, ESteamPacket.UPDATE_TCP_BUFFER, new object[]
+				player.Player.SteamChannel.send("tellSlot", ESteamCall.ALL, ESteamPacket.UPDATE_RELIABLE_BUFFER, new object[]
 				                                {
 					(byte)0,
 					(byte)0,
 					new byte[0]
 				});
-				player.Player.SteamChannel.send("tellSlot", ESteamCall.ALL, ESteamPacket.UPDATE_TCP_BUFFER, new object[]
+				player.Player.SteamChannel.send("tellSlot", ESteamCall.ALL, ESteamPacket.UPDATE_RELIABLE_BUFFER, new object[]
 				                                {
 					(byte)1,
 					(byte)0,
