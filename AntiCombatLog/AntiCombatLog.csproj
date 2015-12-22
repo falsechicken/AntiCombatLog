@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A6EFCE07-C388-41AE-BEFE-54AAA4EAFC17}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -52,12 +52,14 @@
     <Reference Include="Rocket.Unturned">
       <HintPath>..\..\Rocket Libs\Rocket.Unturned.dll</HintPath>
     </Reference>
+    <Reference Include="PropellantLib">
+      <HintPath>..\..\PropellantLib\PropellantLib\bin\Debug\PropellantLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AntiCombatLog.cs" />
     <Compile Include="AntiCombatLogConfiguration.cs" />
-    <Compile Include="InventoryHelper.cs" />
     <Compile Include="CombatLogPlayerComponent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

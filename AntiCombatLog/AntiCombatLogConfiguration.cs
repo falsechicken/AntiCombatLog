@@ -35,6 +35,8 @@ namespace FC.AntiCombatLog
 
 		public bool ReminderNotifications;
 
+		public bool DeletePlayerInventoryData;
+
 		public ushort ReminderNotificationInterval;
 
 		public AntiCombatLogConfiguration ()
@@ -49,6 +51,7 @@ namespace FC.AntiCombatLog
 			ShowCombatLogMessagesToGlobalChat = true;
 			ReminderNotifications = true;
 			ReminderNotificationInterval = 5;
+			DeletePlayerInventoryData = false;
 		}
 	}
 }

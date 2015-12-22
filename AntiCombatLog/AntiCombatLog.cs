@@ -21,6 +21,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -41,6 +42,8 @@ using UnityEngine;
 
 using Steamworks;
 
+using FC.PropellantLib;
+
 namespace FC.AntiCombatLog
 {
 	public class AntiCombatLog : RocketPlugin<AntiCombatLogConfiguration>
@@ -48,9 +51,9 @@ namespace FC.AntiCombatLog
 
 		#region STORAGE VARIABLES
 
-		private List<CSteamID> combatLoggers;
+		private string serverFolder;
 
-		private InventoryHelper invHelper;
+		private List<CSteamID> combatLoggers;
 
 		private CombatLogPlayerComponent tmpComponent;
 
@@ -81,9 +84,9 @@ namespace FC.AntiCombatLog
 		{
 			Instance = this;
 
-			combatLoggers = new List<CSteamID>();
+			serverFolder = System.IO.Directory.GetParent(System.Environment.CurrentDirectory).ToString();
 
-			invHelper = new InventoryHelper();
+			combatLoggers = new List<CSteamID>();
 
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 			U.Events.OnPlayerConnected += OnPlayerConnected;
@@ -123,6 +126,8 @@ namespace FC.AntiCombatLog
 			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
 
 			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
+
+			if (this.Configuration.Instance.DeletePlayerInventoryData) DeletePlayerData(_player.CSteamID);
 		}
 
 		/**
@@ -134,8 +139,8 @@ namespace FC.AntiCombatLog
 		{
 			tmpComponent = UnturnedPlayer.FromCSteamID(_playerID).GetComponent<CombatLogPlayerComponent>();
 
-			invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
-			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
+			Inventory.ClearItems(UnturnedPlayer.FromCSteamID(_playerID));
+			Inventory.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
 			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
 
@@ -162,6 +167,21 @@ namespace FC.AntiCombatLog
 		private void RemovePlayerFromCombatLoggersList(CSteamID _playersID)
 		{
 			combatLoggers.Remove(_playersID);
+		}
+
+		/*
+		 * Deletes a players data/inventory files. Removes the data for all players.
+		 */
+		private void DeletePlayerData(CSteamID _playerID)
+		{
+			for (int charNum = 0; charNum <= 3; charNum++)
+			{
+				try
+				{
+					System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum), true);
+				}
+				catch (IOException e){}
+			}
 		}
 
 		#endregion
@@ -219,6 +239,8 @@ namespace FC.AntiCombatLog
 		private void OnPlayerConnected(UnturnedPlayer _player)
 		{
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
+
+			Logger.Log(Path.GetFullPath(serverFolder + "/Players/" + _player.CSteamID.ToString()));
 
 			if (combatLoggers.Contains(_player.CSteamID)) ProcessReturningCombatLogger(_player.CSteamID);
 			else tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, 
