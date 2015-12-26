@@ -58,7 +58,6 @@
     <Compile Include="AntiCombatLog.cs" />
     <Compile Include="AntiCombatLogConfiguration.cs" />
     <Compile Include="CombatLogPlayerComponent.cs" />
-    <Compile Include="InventoryHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

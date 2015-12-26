@@ -57,8 +57,6 @@ namespace FC.AntiCombatLog
 
 		private CombatLogPlayerComponent tmpComponent;
 
-		private InventoryHelper invHelper;
-
 		public static AntiCombatLog Instance;
 
 		public override TranslationList DefaultTranslations
@@ -85,8 +83,6 @@ namespace FC.AntiCombatLog
 		protected override void Load()
 		{
 			Instance = this;
-
-			invHelper = new InventoryHelper();
 
 			serverFolder = System.IO.Directory.GetParent(System.Environment.CurrentDirectory).ToString();
 
