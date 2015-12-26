@@ -42,8 +42,6 @@ using UnityEngine;
 
 using Steamworks;
 
-using FC.PropellantLib;
-
 namespace FC.AntiCombatLog
 {
 	public class AntiCombatLog : RocketPlugin<AntiCombatLogConfiguration>
@@ -58,6 +56,8 @@ namespace FC.AntiCombatLog
 		private Dictionary<byte, DateTime> lastUsedCharMap; //Used to store the players last used char for inventory deletion.
 
 		private CombatLogPlayerComponent tmpComponent;
+
+		private InventoryHelper invHelper;
 
 		public static AntiCombatLog Instance;
 
@@ -85,6 +85,8 @@ namespace FC.AntiCombatLog
 		protected override void Load()
 		{
 			Instance = this;
+
+			invHelper = new InventoryHelper();
 
 			serverFolder = System.IO.Directory.GetParent(System.Environment.CurrentDirectory).ToString();
 
@@ -144,8 +146,8 @@ namespace FC.AntiCombatLog
 		{
 			tmpComponent = UnturnedPlayer.FromCSteamID(_playerID).GetComponent<CombatLogPlayerComponent>();
 
-			Inventory.ClearItems(UnturnedPlayer.FromCSteamID(_playerID));
-			Inventory.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
+			invHelper.ClearItems(UnturnedPlayer.FromCSteamID(_playerID));
+			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
 			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
 
