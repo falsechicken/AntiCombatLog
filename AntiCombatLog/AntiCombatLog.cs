@@ -55,6 +55,8 @@ namespace FC.AntiCombatLog
 
 		private List<CSteamID> combatLoggers;
 
+		private Dictionary<byte, DateTime> lastUsedCharMap; //Used to store the players last used char for inventory deletion.
+
 		private CombatLogPlayerComponent tmpComponent;
 
 		public static AntiCombatLog Instance;
@@ -87,6 +89,8 @@ namespace FC.AntiCombatLog
 			serverFolder = System.IO.Directory.GetParent(System.Environment.CurrentDirectory).ToString();
 
 			combatLoggers = new List<CSteamID>();
+
+			lastUsedCharMap = new Dictionary<byte, DateTime>();
 
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 			U.Events.OnPlayerConnected += OnPlayerConnected;
@@ -128,6 +132,7 @@ namespace FC.AntiCombatLog
 			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
 
 			if (this.Configuration.Instance.DeletePlayerInventoryData) DeletePlayerData(_player.CSteamID);
+
 		}
 
 		/**
@@ -170,18 +175,40 @@ namespace FC.AntiCombatLog
 		}
 
 		/*
-		 * Deletes a players data/inventory files. Removes the data for all players.
+		 * Deletes a players last used character files.
 		 */
 		private void DeletePlayerData(CSteamID _playerID)
 		{
-			for (int charNum = 0; charNum <= 3; charNum++)
+			byte latestCharUsed = 0; //Store the number of the character the combat logger used.
+
+			DateTime latestCharUsedDate = DateTime.MinValue;; //Store the date and time the last character was used.
+
+			lastUsedCharMap.Clear();
+
+			for (byte charNum = 0; charNum <= 3; charNum++) //Populate the lastUsedCharMap
 			{
 				try
 				{
-					System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum), true);
+					lastUsedCharMap.Add(charNum, System.IO.Directory.GetLastWriteTime(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum));
 				}
-				catch (IOException e){}
+				catch (DirectoryNotFoundException e){}
 			}
+
+			foreach (byte charNum in lastUsedCharMap.Keys) //Loop through the character folder modification dates to find the latest used.
+			{
+				if (lastUsedCharMap[charNum] > latestCharUsedDate)
+				{
+					latestCharUsedDate = lastUsedCharMap[charNum];
+					latestCharUsed = charNum;
+				}
+			}
+
+			try
+			{
+				System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + latestCharUsed), true); //Delete the latest character files/inventory.
+			}
+			catch (IOException e) {}
+		
 		}
 
 		#endregion
@@ -267,5 +294,6 @@ namespace FC.AntiCombatLog
 		}
 
 		#endregion
+
 	}
 }
