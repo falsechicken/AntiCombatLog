@@ -133,7 +133,7 @@ namespace FC.AntiCombatLog
 
 			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
 
-			if (this.Configuration.Instance.DeletePlayerInventoryData) DeletePlayerData(_player.CSteamID);
+			DeletePlayerData(_player.CSteamID);
 
 		}
 
@@ -145,9 +145,6 @@ namespace FC.AntiCombatLog
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
 			tmpComponent = UnturnedPlayer.FromCSteamID(_playerID).GetComponent<CombatLogPlayerComponent>();
-
-			invHelper.ClearItems(UnturnedPlayer.FromCSteamID(_playerID));
-			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
 			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
 
