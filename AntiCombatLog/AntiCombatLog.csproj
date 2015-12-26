@@ -52,9 +52,6 @@
     <Reference Include="Rocket.Unturned">
       <HintPath>..\..\Rocket Libs\Rocket.Unturned.dll</HintPath>
     </Reference>
-    <Reference Include="PropellantLib">
-      <HintPath>..\..\PropellantLib\PropellantLib\bin\Debug\PropellantLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
