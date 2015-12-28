@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiCombatLog", "AntiCombatLog\AntiCombatLog.csproj", "{A6EFCE07-C388-41AE-BEFE-54AAA4EAFC17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiCombatLog", "AntiCombatLog.csproj", "{A6EFCE07-C388-41AE-BEFE-54AAA4EAFC17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
