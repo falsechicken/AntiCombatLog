@@ -34,23 +34,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\Propriatary Libs\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\Propriatary Libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Rocket Libs\Assembly-CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="Rocket.API">
-      <HintPath>..\..\Rocket Libs\Rocket.API.dll</HintPath>
+      <HintPath>lib\Rocket.API.dll</HintPath>
     </Reference>
     <Reference Include="Rocket.Core">
-      <HintPath>..\..\Rocket Libs\Rocket.Core.dll</HintPath>
+      <HintPath>lib\Rocket.Core.dll</HintPath>
     </Reference>
     <Reference Include="Rocket.Unturned">
-      <HintPath>..\..\Rocket Libs\Rocket.Unturned.dll</HintPath>
+      <HintPath>lib\Rocket.Unturned.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>lib\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>lib\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>lib\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -62,5 +62,13 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="lib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\Assembly-CSharp-firstpass.dll" />
+    <None Include="lib\Assembly-CSharp.dll" />
+    <None Include="lib\Rocket.API.dll" />
+    <None Include="lib\Rocket.Core.dll" />
+    <None Include="lib\Rocket.Unturned.dll" />
+    <None Include="lib\UnityEngine.dll" />
   </ItemGroup>
 </Project>
