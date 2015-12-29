@@ -129,14 +129,11 @@ namespace FC.AntiCombatLog
 
 			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
 
-			DeletePlayerData(_player.CSteamID);
-
+			DeleteLastUsedPlayerData(_player.CSteamID);
 		}
 
 		/**
-		 * When the combat logger is "Killed" by ProcessCombatLogger they are added to a list to clear
-		 * their inventory when they come back. This is because clearing their inventory when they
-		 * are disconnecting doesnt work.
+		 * Show the combat logger punish message to the player and remove them from the combat loggers list.
 		 */
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
@@ -172,7 +169,7 @@ namespace FC.AntiCombatLog
 		/*
 		 * Deletes a players last used character files.
 		 */
-		private void DeletePlayerData(CSteamID _playerID)
+		private void DeleteLastUsedPlayerData(CSteamID _playerID)
 		{
 			byte latestCharUsed = 0; //Store the number of the character the combat logger used.
 
@@ -203,7 +200,6 @@ namespace FC.AntiCombatLog
 				System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + latestCharUsed), true); //Delete the latest character files/inventory.
 			}
 			catch (IOException e) {}
-		
 		}
 
 		#endregion
