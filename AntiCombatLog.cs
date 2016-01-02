@@ -121,17 +121,20 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
-			if (_player.HasPermission("nocl")) return;
+			if (_player.HasPermission("nocl")) return; //Break out early if the player is exempt from combat logging rules.
 
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
 			ShowCombatLoggerToConsole(_player);
 
-			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat)
+				ShowCombatLoggerMessageToChat(_player);
 
-			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
-
-			DeleteLastUsedPlayerData(_player.CSteamID);
+			if (this.Configuration.Instance.DropItemsOnDisconnect) 
+				_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+				
+			if (this.Configuration.Instance.DeleteInventoryOnDisconnect)
+				DeleteLastUsedPlayerData(_player.CSteamID);
 		}
 
 		/**

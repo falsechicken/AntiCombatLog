@@ -37,6 +37,10 @@ namespace FC.AntiCombatLog
 
 		public ushort ReminderNotificationInterval;
 
+		public bool DropItemsOnDisconnect;
+
+		public bool DeleteInventoryOnDisconnect;
+
 		public AntiCombatLogConfiguration ()
 		{
 
@@ -49,6 +53,8 @@ namespace FC.AntiCombatLog
 			ShowCombatLogMessagesToGlobalChat = true;
 			ReminderNotifications = true;
 			ReminderNotificationInterval = 5;
+			DropItemsOnDisconnect = true;
+			DeleteInventoryOnDisconnect = true;
 		}
 	}
 }
