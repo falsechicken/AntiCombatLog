@@ -121,6 +121,8 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
+			if (_player.HasPermission("nocl")) return;
+
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
 			ShowCombatLoggerToConsole(_player);
