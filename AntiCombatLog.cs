@@ -186,7 +186,7 @@ namespace FC.AntiCombatLog
 			{
 				try
 				{
-					lastUsedCharMap.Add(charNum, System.IO.Directory.GetLastWriteTime(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum));
+					lastUsedCharMap.Add(charNum, System.IO.Directory.GetLastAccessTime(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum));
 				}
 				catch (DirectoryNotFoundException e){}
 			}
