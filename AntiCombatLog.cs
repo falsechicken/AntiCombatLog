@@ -121,7 +121,7 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
-			if (_player.HasPermission("nocl")) return; //Break out early if the player is exempt from combat logging rules.
+			if (_player.HasPermission("nocl") || _player.IsAdmin) return; //Break out early if the player is exempt from combat logging rules.
 
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
