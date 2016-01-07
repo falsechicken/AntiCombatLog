@@ -263,8 +263,6 @@ namespace FC.AntiCombatLog
 		{
 			tmpComponent = _player.GetComponent<CombatLogPlayerComponent>();
 
-			Logger.Log(Path.GetFullPath(serverFolder + "/Players/" + _player.CSteamID.ToString()));
-
 			if (combatLoggers.Contains(_player.CSteamID)) ProcessReturningCombatLogger(_player.CSteamID);
 			else tmpComponent.Init(this.Configuration.Instance.CombatLogGracePeriod, 
 			                       this.Configuration.Instance.WarningMessageColor,
