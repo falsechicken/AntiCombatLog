@@ -22,6 +22,8 @@
 //
 using System;
 
+
+using Rocket.API;
 using Rocket.Unturned.Player;
 using Rocket.Unturned.Chat;
 
@@ -148,6 +150,8 @@ namespace FC.AntiCombatLog
 
 		private void UpdateNotifications(DateTime _now)
 		{
+			if (Player.HasPermission("nocl") || Player.IsAdmin) return;
+
 			if (configNotifications && (_now - notificationLastShown).Seconds >= configNotificationInterval)
 			{
 				if (Bleeding)
