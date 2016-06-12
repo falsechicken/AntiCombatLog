@@ -176,33 +176,12 @@ namespace FC.AntiCombatLog
 		 */
 		private void DeleteLastUsedPlayerData(CSteamID _playerID)
 		{
-			byte latestCharUsed = 0; //Store the number of the character the combat logger used.
 
-			DateTime latestCharUsedDate = DateTime.MinValue;; //Store the date and time the last character was used.
-
-			lastUsedCharMap.Clear();
-
-			for (byte charNum = 0; charNum <= 3; charNum++) //Populate the lastUsedCharMap
-			{
-				try
-				{
-					lastUsedCharMap.Add(charNum, System.IO.Directory.GetLastAccessTime(serverFolder + "/Players/" + _playerID.ToString() + "_" + charNum));
-				}
-				catch (DirectoryNotFoundException e){}
-			}
-
-			foreach (byte charNum in lastUsedCharMap.Keys) //Loop through the character folder modification dates to find the latest used.
-			{
-				if (lastUsedCharMap[charNum] > latestCharUsedDate)
-				{
-					latestCharUsedDate = lastUsedCharMap[charNum];
-					latestCharUsed = charNum;
-				}
-			}
+			byte lastUsedChar = PlayerTool.getSteamPlayer (_playerID).SteamPlayerID.characterID;
 
 			try
 			{
-				System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + latestCharUsed), true); //Delete the latest character files/inventory.
+				System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + lastUsedChar), true); //Delete the latest character files/inventory.
 			}
 			catch (IOException e) {}
 		}
