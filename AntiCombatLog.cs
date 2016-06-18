@@ -21,6 +21,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 //
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -48,9 +49,11 @@ namespace FC.AntiCombatLog
 
 		#region STORAGE VARIABLES
 
+		private string serverFolder;
+
 		private List<CSteamID> combatLoggers;
 
-		private InventoryHelper invHelper;
+		private Dictionary<byte, DateTime> lastUsedCharMap; //Used to store the players last used char for inventory deletion.
 
 		private CombatLogPlayerComponent tmpComponent;
 
@@ -81,9 +84,11 @@ namespace FC.AntiCombatLog
 		{
 			Instance = this;
 
+			serverFolder = System.IO.Directory.GetParent(System.Environment.CurrentDirectory).ToString();
+
 			combatLoggers = new List<CSteamID>();
 
-			invHelper = new InventoryHelper();
+			lastUsedCharMap = new Dictionary<byte, DateTime>();
 
 			U.Events.OnPlayerDisconnected += OnPlayerDisconnected;
 			U.Events.OnPlayerConnected += OnPlayerConnected;
@@ -116,26 +121,28 @@ namespace FC.AntiCombatLog
 		 */
 		private void ProcessCombatLogger(UnturnedPlayer _player)
 		{
+			if (_player.HasPermission("nocl") || _player.IsAdmin) return; //Break out early if the player is exempt from combat logging rules.
+
 			AddPlayerToCombatLoggersList(_player.CSteamID);
 
 			ShowCombatLoggerToConsole(_player);
 
-			_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat)
+				ShowCombatLoggerMessageToChat(_player);
 
-			if (this.Configuration.Instance.ShowCombatLogMessagesToGlobalChat) ShowCombatLoggerMessageToChat(_player);
+			if (this.Configuration.Instance.DropItemsOnDisconnect) 
+				_player.Damage(255, _player.Position, EDeathCause.PUNCH, ELimb.SKULL, _player.CSteamID); //Drop player items.
+				
+			if (this.Configuration.Instance.DeleteInventoryOnDisconnect)
+				DeleteLastUsedPlayerData(_player.CSteamID);
 		}
 
 		/**
-		 * When the combat logger is "Killed" by ProcessCombatLogger they are added to a list to clear
-		 * their inventory when they come back. This is because clearing their inventory when they
-		 * are disconnecting doesnt work.
+		 * Show the combat logger punish message to the player and remove them from the combat loggers list.
 		 */
 		private void ProcessReturningCombatLogger(CSteamID _playerID)
 		{
 			tmpComponent = UnturnedPlayer.FromCSteamID(_playerID).GetComponent<CombatLogPlayerComponent>();
-
-			invHelper.ClearInv(UnturnedPlayer.FromCSteamID(_playerID));
-			invHelper.ClearClothes(UnturnedPlayer.FromCSteamID(_playerID));
 
 			ShowCombatLoggerPunishToPlayer(UnturnedPlayer.FromCSteamID(_playerID));
 
@@ -162,6 +169,21 @@ namespace FC.AntiCombatLog
 		private void RemovePlayerFromCombatLoggersList(CSteamID _playersID)
 		{
 			combatLoggers.Remove(_playersID);
+		}
+
+		/*
+		 * Deletes a players last used character files.
+		 */
+		private void DeleteLastUsedPlayerData(CSteamID _playerID)
+		{
+
+			byte lastUsedChar = PlayerTool.getSteamPlayer (_playerID).SteamPlayerID.characterID;
+
+			try
+			{
+				System.IO.Directory.Delete(Path.GetFullPath(serverFolder + "/Players/" + _playerID.ToString() + "_" + lastUsedChar), true); //Delete the latest character files/inventory.
+			}
+			catch (IOException e) {}
 		}
 
 		#endregion
@@ -245,5 +267,6 @@ namespace FC.AntiCombatLog
 		}
 
 		#endregion
+
 	}
 }

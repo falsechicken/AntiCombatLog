@@ -63,7 +63,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AntiCombatLog.cs" />
     <Compile Include="AntiCombatLogConfiguration.cs" />
-    <Compile Include="InventoryHelper.cs" />
     <Compile Include="CombatLogPlayerComponent.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
